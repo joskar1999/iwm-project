@@ -49,8 +49,9 @@ def calculate_precision(image, labeled, mask):
     print("true negative: ", true_negative)
     print("false negative: ", false_negative)
     print("accuracy: ", (true_positive + true_negative) / all_pixels)
-    print("sensitivity: ", true_positive / (true_positive + false_negative))
+    print("precision: ", true_positive / (true_positive + false_positive))
     print("specificity: ", true_negative / (false_positive + true_negative))
+    print("sensitivity(recall): ", true_positive / (true_positive + false_negative))
     print()
 
 
@@ -68,20 +69,12 @@ def label_image(file_name, labeled_file_name, mask_file_name):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     labeled = cv2.cvtColor(labeled, cv2.COLOR_BGR2GRAY)
     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-    # image = adjust_gamma(image, gamma=1.5)
 
     image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 19, 7)
-
-    kernel = np.ones((1, 1), np.uint8)
-    image = cv2.erode(image, kernel, iterations=1)
-    image = cv2.dilate(image, kernel, iterations=1)
-
-    kernel = np.ones((1, 1), np.uint8)
-    image = cv2.morphologyEx(image, cv2.MORPH_CLOSE, kernel, iterations=7)
-
     calculate_precision(image, labeled, mask)
-    # cv2.imshow('window', image)
-    # cv2.waitKey(0)
+    numpy_horizontal_concat = np.concatenate((image, labeled), axis=1)
+    cv2.imshow('window', numpy_horizontal_concat)
+    cv2.waitKey(0)
 
 
 if __name__ == "__main__":
